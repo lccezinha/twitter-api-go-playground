@@ -10,6 +10,20 @@ import (
   "github.com/rendon/tw"
 )
 
+func getTwitterClient() *tw.Client {
+  var twitterClient *tw.Client
+  twitterClient = tw.NewClient()
+
+  consumerKey    := os.Getenv("TWITTER_CONSUMER_KEY")
+  consumerSecret := os.Getenv("TWITTER_CONSUMER_SECRET")
+
+  if err := twitterClient.SetKeys(consumerKey, consumerSecret); err != nil {
+    log.Fatalf("Failed to get credentials: %s", err)
+  }
+
+  return twitterClient
+}
+
 func checkError(err error) {
     if err != nil {
         panic(err)
@@ -26,31 +40,19 @@ func index(w http.ResponseWriter, r *http.Request) {
   t.Execute(w, nil)
 }
 
-func getTwitterClient() *tw.Client {
-  var twitterClient *tw.Client
-  twitterClient = tw.NewClient()
-
-  consumerKey    := os.Getenv("TWITTER_CONSUMER_KEY")
-  consumerSecret := os.Getenv("TWITTER_CONSUMER_SECRET")
-
-  if err := twitterClient.SetKeys(consumerKey, consumerSecret); err != nil {
-    log.Fatalf("Failed to get credentials: %s", err)
-  }
-
-  return twitterClient
-}
-
 func getTweets(w http.ResponseWriter, r *http.Request) {
   w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
+  username := r.FormValue("username")
+
   twitterClient := getTwitterClient()
-  user, err := twitterClient.GetUsersShow("lccezinha")
+  tweets, err := twitterClient.GetTweets(username, 10)
+
   if err != nil {
-    log.Fatalf("Failed to get user: %s", err)
+    log.Fatalf("Failed to load tweets from username: %s", username)
   }
 
-  fmt.Printf("User ID: %d\n", user.ID)
-  fmt.Printf("User name: %s\n", user.ScreenName)
+  fmt.Print(tweets)
 }
 
 func main() {
