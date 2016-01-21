@@ -5,7 +5,6 @@ import (
   "html/template"
   "log"
   "os"
-  "fmt"
 
   "github.com/rendon/tw"
 )
@@ -52,7 +51,11 @@ func getTweets(w http.ResponseWriter, r *http.Request) {
     log.Fatalf("Failed to load tweets from username: %s", username)
   }
 
-  fmt.Print(tweets)
+  htmlPage := "views/result.html"
+  t, err := template.ParseFiles(htmlPage)
+  checkError(err)
+
+  t.Execute(w, tweets)
 }
 
 func main() {
