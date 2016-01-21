@@ -1,0 +1,7 @@
+<h3>Get recent tweets!</h3>
+
+<ol>
+  {{range $index, $element := .}}
+    <li>{{$element.Text}}</li>
+  {{end}}
+</ol>
